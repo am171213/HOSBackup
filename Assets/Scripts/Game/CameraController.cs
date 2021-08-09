@@ -66,8 +66,8 @@ public class CameraController : MonoBehaviour
 		maxX = camData.maxCamX;
 		camY = camData.camYPos;
 		xOffset = camData.camXOffset;
-		Debug.Log(camX);
-		Debug.Log(xOffset);
+		//Debug.Log(camX);
+		//Debug.Log(xOffset);
 		ChangeCamPosition(camX+xOffset,camY);
 	}
 	

@@ -180,6 +180,8 @@ public class InventoryController : MonoBehaviour
 		GetItemSlot(slotNum).GetComponent<Item>().SetItemName("");
 		GetItemSlot(slotNum).GetComponent<Item>().SetItemCode("");
 		GetItemSlot(slotNum).GetComponent<Item>().SetItemPic(null);
+		
+		GetItemSlot(slotNum).GetComponent<Transform>().GetChild(0).GetComponent<Text>().text = "";
 	}
 	
 	public void ShowInventory()

@@ -31,15 +31,16 @@ public class PauseMenuController : MonoBehaviour
 
 	public void Resume()
 	{
-		pauseMenuUI.SetActive (false);
 		Time.timeScale = 1f;
+		pauseMenuUI.SetActive (false);
+		
 		gamePaused = false;
 	}
 
 	public void Pause()
 	{
 		pauseMenuUI.SetActive (true);
-		Time.timeScale = 0f;
+		Time.timeScale = 0.000001f;
 		gamePaused = true;
 	}
 

@@ -30,13 +30,14 @@ public class DialogueController : MonoBehaviour
 	
 	public void StartDialogue(Dialogue dialogue)
 	{
-		textToSay.Clear();
 		anim.SetBool("IsOpen",true);
 		nameText.text = dialogue.name;
 		txtBox.SetActive(true);
+			textToSay.Clear();
 
 		foreach (string line in dialogue.textToSay)
 		{
+			//Debug.Log(line);
 			textToSay.Enqueue(line);
 		}
 		DisplayNextSentence();
@@ -45,6 +46,7 @@ public class DialogueController : MonoBehaviour
 	public void DisplayNextSentence()
 	{
 		dialogueText.text = "";
+		//Debug.Log(textToSay.Count);
 		if (textToSay.Count == 0)
 		{
 			EndDialogue();
@@ -60,6 +62,7 @@ public class DialogueController : MonoBehaviour
 	{
 		foreach(char letter in line.ToCharArray())
 		{
+			//Debug.Log(letter);
 			dialogueText.text += letter;
 			yield return new WaitForSeconds(1-(typingSpeed*.01f));
 		}
@@ -67,6 +70,7 @@ public class DialogueController : MonoBehaviour
 	
 	public void EndDialogue()
 	{
+		//Debug.Log("Dialogue Stopped");
 		StopAllCoroutines();
 		textToSay.Clear();
 		txtBox.SetActive(false);

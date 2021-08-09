@@ -51,12 +51,21 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 9158372430389261990}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1512af76e098bc54c846dadfe1a1091f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  triggerObject: {fileID: 0}
-  event1Start: 0
-  waitTime: 10
-  loadTime: 2
+  globalLight: {fileID: 0}
+  player: {fileID: 0}
+  triggerDesk: {fileID: 0}
+  event1CamData: {fileID: 2823558272554067105, guid: 9e863cf8b6c2a724480a83568c72d65a,
+    type: 3}
+  cutscene1CamData: {fileID: 795882073634833009, guid: 4cd17007502136a4fab24b3a2df47073,
+    type: 3}
+  triggerDoor: {fileID: 0}
+  lucyObject: {fileID: 0}
+  inCutscene: 0
+  playText: 0
+  waitTime: 4
+  loadTime: 4

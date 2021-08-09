@@ -27,6 +27,7 @@ public class PlayerController: MonoBehaviour
 	private InventoryController inventoryController;
 	public Dialogue dialogue;
 	public Queue<string> edwardText;
+	private Events eventManager;
 
 	//Movement
 	public float playerSpeed = 2;
@@ -59,114 +60,128 @@ public class PlayerController: MonoBehaviour
 		//lightSourceObject = gameObject.transform.GetChild (0).gameObject;
 		dialogueManager = GameObject.Find("DialogueManager");
 		inventoryController = GameObject.Find("InventoryManager").GetComponent<InventoryController>();
+		eventManager = GameObject.Find("GameMaster").GetComponent<Events>();
 	}
 		
 	void Update()
 	{
-		//Movement Left or Right
-		movementInput = Input.GetAxisRaw("Horizontal");
-
-		//Sprint Button
-		if (Input.GetButtonDown ("Sprint")) 
+		
+		
+		if (!eventManager.inCutscene)
 		{
-			Sprint ();
-		}
-
-		//Interact Button
-		if (Input.GetButtonDown ("Interact"))	
-		{
-			if (onInteractable)
+			//Movement Left or Right
+			movementInput = Input.GetAxisRaw("Horizontal");
+			//Sprint Button
+			if (Input.GetButtonDown ("Sprint")) 
 			{
-				if (!interacting && interactingObject!= null)
+				Sprint ();
+			}
+
+			//Interact Button
+			if (Input.GetButtonDown ("Interact"))	
+			{
+				if (onInteractable)
 				{
-					interacting = true;
-					//Debug.Log(interactingObject);
-					interactingObject.GetComponent<Interactable>().Interaction();	
+					if (!interacting && interactingObject!= null)
+					{
+						interacting = true;
+						//Debug.Log(interactingObject);
+						interactingObject.GetComponent<Interactable>().Interaction();	
+					}
+					else 
+					{
+						dialogueManager.GetComponent<DialogueController>().DisplayNextSentence();
+					}
 				}
-				else 
+				else
 				{
-					dialogueManager.GetComponent<DialogueController>().DisplayNextSentence();
+					dialogueManager.GetComponent<DialogueController>().EndDialogue();
 				}
 			}
 			else
-			{
-				dialogueManager.GetComponent<DialogueController>().EndDialogue();
-			}
-		}
-		else
-		{			
-			if (onInteractable && interactingObject != null)
-			{
-				interactingObject.GetComponent<Interactable>().DisplayMessage();
-			}
-		}
-		
-		if(Input.GetButtonDown ("Inventory"))
-		{
-			if(!showInventory)
-			{
-				showInventory = true;
-				inventoryController.OpenInventory();
-			}
-			
-			else if(showInventory)
-			{
-				showInventory = false;
-				inventoryController.CloseInventory();
-			}
-		}
-		
-		if (Input.GetButtonDown("PickUp") && onItem)
-		{
-			if (itemObject != null )
-			{
-				inventoryController.AddToInventory(itemObject);
-				Destroy(itemObject);
-			}
-		}
-		
-		var input = Input.inputString;
-		
-		if (showInventory && onInteractable)
-		{
-			if (input == "1" ||input == "2" ||input == "3" ||input == "4" || input =="5" || input =="6" || input =="7" ||input == "8" ||input == "9" || input =="0")
-			{
-				int itemNum = Convert.ToInt32(input);
-				if (inventoryController.IsItemValid(itemNum))
+			{			
+				if (onInteractable && interactingObject != null)
 				{
-					if (inventoryController.CheckItemMatching(itemNum, interactingObject))
-					{
-						Item item = inventoryController.GetItem(itemNum);
-						if(interactingObject.GetComponent<Interactable>().UseItemOn(inventoryController.GetItemSlot(itemNum).GetComponent<Item>().GetItemCode()))
-						{
-							if (interactingObject.GetComponent<Keycard>() != null)
-							{	
-								interactingObject.GetComponent<Keycard>().activated = true;
-								StartCoroutine(interactingObject.GetComponent<Keycard>().KeycardAnim());
-								//Debug.Log("Interacting object has keycard component.");
-								DialogueEvent(new string[] {"The door is unlocked."});
-							}
-							
-							//interactingObject.GetComponent<Interactable>().UseItemOn
-							if (item.itemRemoval == true)
-							{
-								inventoryController.RemoveFromInventory(itemNum);
-							}	
-						}
-					}
-					else
-					{	
-						if (interactingObject.GetComponent<Keycard>() != null)
-						{
-							StartCoroutine(interactingObject.GetComponent<Keycard>().KeycardAnim());
-						}
-						DialogueEvent(new string[] {"That doesn't go there."});
-						
-					}
+					interactingObject.GetComponent<Interactable>().DisplayMessage();
 				}
 			}
-		}	
-		input = "";
+			
+			if(Input.GetButtonDown ("Inventory"))
+			{
+				if(!showInventory)
+				{
+					showInventory = true;
+					inventoryController.OpenInventory();
+				}
+				
+				else if(showInventory)
+				{
+					showInventory = false;
+					inventoryController.CloseInventory();
+				}
+			}
+			
+			if (Input.GetButtonDown("PickUp") && onItem)
+			{
+				if (itemObject != null )
+				{
+					inventoryController.AddToInventory(itemObject);
+					Destroy(itemObject);
+				}
+			}
+			
+			var input = Input.inputString;
+			
+			if (showInventory && onInteractable)
+			{
+				if (input == "1" ||input == "2" ||input == "3" ||input == "4" || input =="5" || input =="6" || input =="7" ||input == "8" ||input == "9" || input =="0")
+				{
+					int itemNum = Convert.ToInt32(input);
+					if (inventoryController.IsItemValid(itemNum))
+					{
+						if (inventoryController.CheckItemMatching(itemNum, interactingObject))
+						{
+							Item item = inventoryController.GetItem(itemNum);
+							if(interactingObject.GetComponent<Interactable>().UseItemOn(inventoryController.GetItemSlot(itemNum).GetComponent<Item>().GetItemCode()))
+							{
+								if (interactingObject.GetComponent<Keycard>() != null)
+								{	
+									interactingObject.GetComponent<Keycard>().activated = true;
+									StartCoroutine(interactingObject.GetComponent<Keycard>().KeycardAnim());
+									//Debug.Log("Interacting object has keycard component.");
+									DialogueEvent(new string[] {"The door is unlocked."});
+								}
+								
+								//interactingObject.GetComponent<Interactable>().UseItemOn
+								if (item.itemRemoval == true)
+								{
+									inventoryController.RemoveFromInventory(itemNum);
+								}	
+							}
+						}
+						else
+						{	
+							if (interactingObject.GetComponent<Keycard>() != null)
+							{
+								StartCoroutine(interactingObject.GetComponent<Keycard>().KeycardAnim());
+							}
+							DialogueEvent(new string[] {"That doesn't go there."});
+							
+						}
+					}
+				}
+			}	
+			input = "";
+		}
+		
+		else
+		{
+			Debug.Log("In Cutscene");
+			if (Input.GetButtonDown ("Interact"))
+			{
+				dialogueManager.GetComponent<DialogueController>().DisplayNextSentence();
+			}
+		}
 	}
 
 	private void FixedUpdate()
@@ -180,8 +195,11 @@ public class PlayerController: MonoBehaviour
 	public void DialogueEvent(string[] textToSay)
 	{
 		dialogue.textToSay = textToSay;
+		//Debug.Log(dialogue.textToSay[0]);
 		dialogueManager.GetComponent<DialogueController>().SetTextToSay(dialogue.textToSay);
+		//Debug.Log(dialogue.textToSay[0]);
 		dialogueManager.GetComponent<DialogueController>().StartDialogue(dialogue);
+		//Debug.Log(dialogue.textToSay[0]);
 	}
 
 	//-------------------------------------------CONTROLS------------------------------------------//

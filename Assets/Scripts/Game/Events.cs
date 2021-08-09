@@ -15,6 +15,9 @@ public class Events : MonoBehaviour
 	public Level event1CamData;
 	public Level cutscene1CamData;
 	public GameObject triggerDoor;
+	public GameObject lucyObject;
+	public bool inCutscene = false;
+	public bool playText = false;
 	
 	//Event Booleans
 	private bool event1Start = false;
@@ -28,10 +31,18 @@ public class Events : MonoBehaviour
 	
 	public void Start()
 	{
+		Debug.Log("Start");
+		
 		//Commonly Used Objects
 		camera = GameObject.Find("Main Camera").GetComponent<CameraController> ();	
 		lightSwitch = GameObject.Find("EmLightSwitch");
 		emLightCont = lightSwitch.GetComponent<EmLightSwitch>();
+		triggerDesk = GameObject.Find("TriggerDesk");
+		triggerDoor =  GameObject.Find("TriggerDoor");
+		globalLight = GameObject.Find("GlobalLight");
+		player = GameObject.Find("Edward");
+		lucyObject = GameObject.Find("Lucy");
+		
 	}
 	
 	public void Update()
@@ -59,7 +70,9 @@ public class Events : MonoBehaviour
 	public void EventHandler()
 	{
 		if (triggerDesk.GetComponent<Desk>().GetTriggered() && triggerDesk != null && !event1Start)
-		{event1Start = true;}
+		{event1Start = true;
+			Debug.Log("Start RoomChange");
+		}
 		
 		if (triggerDoor.GetComponent<Door>().GetTriggered() && triggerDoor != null && !cutscene1Start)
 		{
@@ -81,11 +94,9 @@ public class Events : MonoBehaviour
 	
 	public IEnumerator Floor1RoomChange(float waitT, float loadT)
 	{
-		yield return new WaitForSeconds(waitTime);
+		yield return new WaitForSecondsRealtime(waitTime);
 		globalLight.GetComponent<Animator>().SetBool("LightsOff", true);
-		yield return new WaitForSeconds(loadTime);
-		
-		player.GetComponent<PlayerController>().playerSpeed = 0.0f;
+		yield return new WaitForSecondsRealtime(loadTime);
 				
 		event1CamData.startCamX = player.transform.position.x;
 		camera.RoomChange(event1CamData);
@@ -96,21 +107,31 @@ public class Events : MonoBehaviour
 		if (emLightCont != null)
 		{emLightCont.TurnOnLights();}
 		
-		player.GetComponent<PlayerController>().playerSpeed = 2.0f;
-		player.GetComponent<PlayerController>().sprinting = false;
-		
 		triggerDesk.GetComponent<Desk>().SetTriggered(false);
 		event1Start = false;
-		//Debug.Log("Room Change");
 	}
 	
 	public IEnumerator Cutscene1 ()
-	{	
+	{		
+		inCutscene = true;
 		//Debug.Log("Play Cutscene");
-		player.GetComponent<PlayerController>().playerSpeed = 0.0f;
+		//player.GetComponent<PlayerController>().playerSpeed = 0.0f;
 		camera.RoomChange(cutscene1CamData);
 	
-		yield return new WaitForSeconds(1);	
+		if(!playText)
+		{
+			player.GetComponent<PlayerController>().DialogueEvent(new string[] {"Lucy!","Oh God. No!"});
+			
+			playText = true;
+		}
+		
+		lucyObject.GetComponent<Lucy>().lucyTransform = true;
+		yield return new WaitForSeconds(5);
+		
+		lucyObject.GetComponent<Lucy>().lucyDisappear = true;
+		yield return new WaitForSeconds(4);	
+		
+		inCutscene = false;	
 		cutscene1Start = false;
 	}
 }

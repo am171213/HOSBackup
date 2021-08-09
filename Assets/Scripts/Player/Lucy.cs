@@ -5,8 +5,8 @@ using UnityEngine;
 public class Lucy : MonoBehaviour
 {
 	private Animator anim;
-    private bool lucyTransform = false;
-	private bool lucyDisappear = false;
+    public bool lucyTransform = false;
+	public bool lucyDisappear = false;
 	
 	void Start()
 	{
@@ -15,9 +15,19 @@ public class Lucy : MonoBehaviour
 	
 	void Update()
 	{
-		if (lucyTransform)
+		if (lucyTransform && !lucyDisappear)
 		{
+			anim.SetBool("transform", true);
 			
+			lucyTransform = false;
+		}
+		
+		if (lucyDisappear)
+		{
+			anim.SetBool("transform", false);
+			anim.SetBool("disappear", true);
+			
+			lucyDisappear = false;
 		}
 	}
 }
